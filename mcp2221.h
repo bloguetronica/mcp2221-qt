@@ -42,7 +42,7 @@ public:
     static const int ERROR_NOT_FOUND = 2;  // Returned by open() if the device was not found
     static const int ERROR_BUSY = 3;       // Returned by open() if the device is already in use
 
-    MCP2221();
+    explicit MCP2221();
     ~MCP2221();
 
     bool disconnected() const;
