@@ -24,6 +24,7 @@
 // Includes
 #include <QString>
 #include <QStringList>
+#include <QVector>
 #include <libusb-1.0/libusb.h>
 
 class MCP2221
