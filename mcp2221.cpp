@@ -25,6 +25,50 @@ extern "C" {
 #include "libusb-extra.h"
 }
 
+// Definitions
+const quint8 EPIN = 0x81;             // Address of endpoint assuming the IN direction
+const quint8 EPOUT = 0x01;            // Address of endpoint assuming the OUT direction
+const unsigned int TR_TIMEOUT = 500;  // Transfer timeout in milliseconds
+
+// Private generic function that is used to get any descriptor
+QString MCP2221::getDescGeneric(quint8 subcomid, int &errcnt, QString &errstr)
+{
+    QVector<quint8> command{
+        READ_FLASH_DATA, subcomid  // Header
+    };
+    QVector<quint8> response = hidTransfer(command, errcnt, errstr);
+    size_t maxSize = 2 * DESC_MAXLEN;  // Maximum size of the descriptor in bytes (the zero padding at the end takes two more bytes)
+    size_t size = response.at(2) - 2;  // Descriptor actual size, excluding the padding
+    size = size > maxSize ? maxSize : size;  // This also fixes an erroneous result due to a possible unsigned integer rollover
+    QString descriptor;
+    for (size_t i = 0; i < size; i += 2) {
+        descriptor += QChar(response.at(i + PREAMBLE_SIZE + 3) << 8 | response.at(i + PREAMBLE_SIZE + 2));  // UTF-16LE conversion as per the USB 2.0 specification
+    }
+    return descriptor;
+}
+
+// Private function that is used to perform interrupt transfers
+void MCP2221::interruptTransfer(quint8 endpointAddr, unsigned char *data, int length, int *transferred, int &errcnt, QString &errstr)
+{
+    if (!isOpen()) {
+        ++errcnt;
+        errstr += QObject::tr("In interruptTransfer(): device is not open.\n");  // Program logic error
+    } else {
+        int result = libusb_interrupt_transfer(handle_, endpointAddr, data, length, transferred, TR_TIMEOUT);
+        if (result != 0 || (transferred != nullptr && *transferred != length)) {  // The number of transferred bytes is also verified, as long as a valid (non-null) pointer is passed via "transferred"
+            ++errcnt;
+            if (endpointAddr < 0x80) {
+                errstr += QObject::tr("Failed interrupt OUT transfer to endpoint %1 (address 0x%2).\n").arg(0x0f & endpointAddr).arg(endpointAddr, 2, 16, QChar('0'));
+            } else {
+                errstr += QObject::tr("Failed interrupt IN transfer from endpoint %1 (address 0x%2).\n").arg(0x0f & endpointAddr).arg(endpointAddr, 2, 16, QChar('0'));
+            }
+            if (result == LIBUSB_ERROR_NO_DEVICE || result == LIBUSB_ERROR_IO) {  // Note that libusb_interrupt_transfer() may return "LIBUSB_ERROR_IO" [-1] on device disconnect
+                disconnected_ = true;  // This reports that the device has been disconnected
+            }
+        }
+    }
+}
+
 MCP2221::MCP2221() :
     context_(nullptr),
     handle_(nullptr),
@@ -62,6 +106,55 @@ void MCP2221::close()
         libusb_exit(context_);  // Deinitialize libusb
         handle_ = nullptr;  // Required to mark the device as closed
     }
+}
+
+// Retrieves the manufacturer descriptor from the MCP2221 flash memory
+QString MCP2221::getManufacturerDesc(int &errcnt, QString &errstr)
+{
+    return getDescGeneric(MANUFACTURER_DESC, errcnt, errstr);
+}
+
+// Retrieves the product descriptor from the MCP2221 flash memory
+QString MCP2221::getProductDesc(int &errcnt, QString &errstr)
+{
+    return getDescGeneric(PRODUCT_DESC, errcnt, errstr);
+}
+
+// Retrieves the serial descriptor from the MCP2221 flash memory
+QString MCP2221::getSerialDesc(int &errcnt, QString &errstr)
+{
+    return getDescGeneric(SERIAL_DESC, errcnt, errstr);
+}
+
+// Sends a HID command based on the given vector, and returns the response
+// The command vector can be shorter or longer than 64 bytes, but the resulting command will either be padded with zeros or truncated in order to fit
+QVector<quint8> MCP2221::hidTransfer(const QVector<quint8> &data, int &errcnt, QString &errstr)
+{
+    size_t vecSize = static_cast<size_t>(data.size());
+    size_t bytesToFill = vecSize > COMMAND_SIZE ? COMMAND_SIZE : vecSize;
+    unsigned char commandBuffer[COMMAND_SIZE] = {0x00};  // It is important to initialize the array in this manner, so that unused indexes are filled with zeros!
+    for (size_t i = 0; i < bytesToFill; ++i) {
+        commandBuffer[i] = data[i];
+    }
+    int preverrcnt = errcnt;
+#if LIBUSB_API_VERSION >= 0x01000105
+    interruptTransfer(EPOUT, commandBuffer, static_cast<int>(COMMAND_SIZE), nullptr, errcnt, errstr);
+#else
+    int bytesWritten;
+    interruptTransfer(EPOUT, commandBuffer, static_cast<int>(COMMAND_SIZE), &bytesWritten, errcnt, errstr);
+#endif
+    unsigned char responseBuffer[COMMAND_SIZE];
+    int bytesRead = 0;  // Important!
+    interruptTransfer(EPIN, responseBuffer, static_cast<int>(COMMAND_SIZE), &bytesRead, errcnt, errstr);
+    QVector<quint8> retdata(static_cast<int>(COMMAND_SIZE));
+    for (int i = 0; i < bytesRead; ++i) {
+        retdata[i] = responseBuffer[i];
+    }
+    if (errcnt == preverrcnt && (bytesRead < static_cast<int>(COMMAND_SIZE) || responseBuffer[0] != commandBuffer[0])) {  // This additional verification only makes sense if the error count does not increase
+        ++errcnt;
+        errstr += QObject::tr("Received invalid response to HID command.\n");
+    }
+    return retdata;
 }
 
 // Opens the device having the given VID, PID and, optionally, the given serial number, and assigns its handle

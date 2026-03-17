@@ -33,14 +33,30 @@ private:
     libusb_device_handle *handle_;
     bool disconnected_, kernelWasAttached_;
 
+    QString getDescGeneric(quint8 subcomid, int &errcnt, QString &errstr);
+    void interruptTransfer(quint8 endpointAddr, unsigned char *data, int length, int *transferred, int &errcnt, QString &errstr);
+
 public:
     // Class definitions
-    static const quint16 VID = 0x04d8;     // Default USB vendor ID
-    static const quint16 PID = 0x00dd;     // Default USB product ID
-    static const int SUCCESS = 0;          // Returned by open() if successful
-    static const int ERROR_INIT = 1;       // Returned by open() in case of a libusb initialization failure
-    static const int ERROR_NOT_FOUND = 2;  // Returned by open() if the device was not found
-    static const int ERROR_BUSY = 3;       // Returned by open() if the device is already in use
+    static const quint16 VID = 0x04d8;      // Default USB vendor ID
+    static const quint16 PID = 0x00dd;      // Default USB product ID
+    static const int SUCCESS = 0;           // Returned by open() if successful
+    static const int ERROR_INIT = 1;        // Returned by open() in case of a libusb initialization failure
+    static const int ERROR_NOT_FOUND = 2;   // Returned by open() if the device was not found
+    static const int ERROR_BUSY = 3;        // Returned by open() if the device is already in use
+    static const size_t COMMAND_SIZE = 64;  // HID command size
+    static const size_t PREAMBLE_SIZE = 2;  // HID command preamble size
+
+    // Descriptor specific definitions
+    static const size_t DESC_MAXLEN = 30;  // Maximum length for any descriptor
+
+    // HID command IDs
+    static const quint8 READ_FLASH_DATA = 0xb0;  // Read flash memory data
+
+    // Flash data sub-command IDs
+    static const quint8 MANUFACTURER_DESC = 0x02;  // USB manufacturer descriptor
+    static const quint8 PRODUCT_DESC = 0x03;       // USB product descriptor
+    static const quint8 SERIAL_DESC = 0x04;        // USB serial descriptor
 
     explicit MCP2221();
     ~MCP2221();
@@ -49,6 +65,10 @@ public:
     bool isOpen() const;
 
     void close();
+    QString getManufacturerDesc(int &errcnt, QString &errstr);
+    QString getProductDesc(int &errcnt, QString &errstr);
+    QString getSerialDesc(int &errcnt, QString &errstr);
+    QVector<quint8> hidTransfer(const QVector<quint8> &data, int &errcnt, QString &errstr);
     int open(quint16 vid, quint16 pid, const QString &serial = QString());
 
     static QStringList listDevices(quint16 vid, quint16 pid, int &errcnt, QString &errstr);
