@@ -54,7 +54,7 @@ public:
 
     // HID command IDs
     static const quint8 READ_FLASH_DATA = 0xb0;   // Read flash memory data
-    static const quint8 WRITE_FLASH_DATA = 0xb1;  // Read flash memory data
+    static const quint8 WRITE_FLASH_DATA = 0xb1;  // Write flash memory data
 
     // Flash data sub-command IDs
     static const quint8 MANUFACTURER_DESC = 0x02;  // USB manufacturer descriptor
