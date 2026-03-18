@@ -69,6 +69,23 @@ void MCP2221::interruptTransfer(quint8 endpointAddr, unsigned char *data, int le
     }
 }
 
+// Private generic function that is used to write any descriptor
+quint8 MCP2221::writeDescGeneric(const QString &descriptor, quint8 subcomid, int &errcnt, QString &errstr)
+{
+    int strLength = descriptor.size();  // Descriptor string length
+    QVector<quint8> command(2 * strLength + PREAMBLE_SIZE + 2);
+    command[0] = WRITE_FLASH_DATA;                        // Header
+    command[1] = subcomid;
+    command[2] = static_cast<quint8>(2 * strLength + 2);  // Descriptor length in bytes
+    command[3] = 0x03;                                    // USB descriptor constant
+    for (int i = 0; i < strLength; ++i) {
+        command[2 * i + PREAMBLE_SIZE + 2] = static_cast<quint8>(descriptor[i].unicode());
+        command[2 * i + PREAMBLE_SIZE + 3] = static_cast<quint8>(descriptor[i].unicode() >> 8);
+    }
+    QVector<quint8> response = hidTransfer(command, errcnt, errstr);
+    return response.at(1);
+}
+
 MCP2221::MCP2221() :
     context_(nullptr),
     handle_(nullptr),
@@ -200,6 +217,48 @@ int MCP2221::open(quint16 vid, quint16 pid, const QString &serial)
                 retval = SUCCESS;
             }
         }
+    }
+    return retval;
+}
+
+// Writes the manufacturer descriptor to the MCP2221 flash memory
+quint8 MCP2221::writeManufacturerDesc(const QString &manufacturer, int &errcnt, QString &errstr)
+{
+    quint8 retval;
+    if (static_cast<size_t>(manufacturer.size()) > DESC_MAXLEN) {
+        ++errcnt;
+        errstr += QObject::tr("In writeManufacturerDesc(): manufacturer descriptor string cannot be longer than 30 characters.\n");  // Program logic error
+        retval = OTHER_ERROR;
+    } else {
+        retval = writeDescGeneric(manufacturer, MANUFACTURER_DESC, errcnt, errstr);
+    }
+    return retval;
+}
+
+// Writes the product descriptor to the MCP2221 flash memory
+quint8 MCP2221::writeProductDesc(const QString &product, int &errcnt, QString &errstr)
+{
+    quint8 retval;
+    if (static_cast<size_t>(product.size()) > DESC_MAXLEN) {
+        ++errcnt;
+        errstr += QObject::tr("In writeProductDesc(): product descriptor string cannot be longer than 30 characters.\n");  // Program logic error
+        retval = OTHER_ERROR;
+    } else {
+        retval = writeDescGeneric(product, PRODUCT_DESC, errcnt, errstr);
+    }
+    return retval;
+}
+
+// Writes the serial descriptor to the MCP2221 flash memory
+quint8 MCP2221::writeSerialDesc(const QString &serial, int &errcnt, QString &errstr)
+{
+    quint8 retval;
+    if (static_cast<size_t>(serial.size()) > DESC_MAXLEN) {
+        ++errcnt;
+        errstr += QObject::tr("In writeSerialDesc(): serial descriptor string cannot be longer than 30 characters.\n");  // Program logic error
+        retval = OTHER_ERROR;
+    } else {
+        retval = writeDescGeneric(serial, SERIAL_DESC, errcnt, errstr);
     }
     return retval;
 }

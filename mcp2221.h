@@ -36,6 +36,7 @@ private:
 
     QString getDescGeneric(quint8 subcomid, int &errcnt, QString &errstr);
     void interruptTransfer(quint8 endpointAddr, unsigned char *data, int length, int *transferred, int &errcnt, QString &errstr);
+    quint8 writeDescGeneric(const QString &descriptor, quint8 subcomid, int &errcnt, QString &errstr);
 
 public:
     // Class definitions
@@ -52,13 +53,22 @@ public:
     static const size_t DESC_MAXLEN = 30;  // Maximum length for any descriptor
 
     // HID command IDs
-    static const quint8 READ_FLASH_DATA = 0xb0;  // Read flash memory data
+    static const quint8 READ_FLASH_DATA = 0xb0;   // Read flash memory data
+    static const quint8 WRITE_FLASH_DATA = 0xb1;  // Read flash memory data
 
     // Flash data sub-command IDs
     static const quint8 MANUFACTURER_DESC = 0x02;  // USB manufacturer descriptor
     static const quint8 PRODUCT_DESC = 0x03;       // USB product descriptor
     static const quint8 SERIAL_DESC = 0x04;        // USB serial descriptor
     static const quint8 FACTORY_SERIAL = 0x05;     // Chip factory serial number
+
+    // HID command responses
+    static const quint8 COMPLETED = 0x00;      // Command completed successfully
+    static const quint8 BUSY = 0x01;           // I2C engine is busy (command not completed), or command is not supported (while reading flash memory data)
+    static const quint8 NOT_SUPPORTED = 0x02;  // Command not supported (alternate response)
+    static const quint8 NOT_ALLOWED = 0x03;    // Command not allowed
+    //TODO
+    static const quint8 OTHER_ERROR = 0xff;    // Other error (check errcnt and errstr for details)
 
     explicit MCP2221();
     ~MCP2221();
@@ -73,6 +83,9 @@ public:
     QString getSerialDesc(int &errcnt, QString &errstr);
     QVector<quint8> hidTransfer(const QVector<quint8> &data, int &errcnt, QString &errstr);
     int open(quint16 vid, quint16 pid, const QString &serial = QString());
+    quint8 writeManufacturerDesc(const QString &manufacturer, int &errcnt, QString &errstr);
+    quint8 writeProductDesc(const QString &product, int &errcnt, QString &errstr);
+    quint8 writeSerialDesc(const QString &product, int &errcnt, QString &errstr);
 
     static QStringList listDevices(quint16 vid, quint16 pid, int &errcnt, QString &errstr);
 };
