@@ -58,6 +58,7 @@ public:
     static const quint8 MANUFACTURER_DESC = 0x02;  // USB manufacturer descriptor
     static const quint8 PRODUCT_DESC = 0x03;       // USB product descriptor
     static const quint8 SERIAL_DESC = 0x04;        // USB serial descriptor
+    static const quint8 FACTORY_SERIAL = 0x05;     // Chip factory serial number
 
     explicit MCP2221();
     ~MCP2221();
@@ -66,6 +67,7 @@ public:
     bool isOpen() const;
 
     void close();
+    QString getFactorySerial(int &errcnt, QString &errstr);
     QString getManufacturerDesc(int &errcnt, QString &errstr);
     QString getProductDesc(int &errcnt, QString &errstr);
     QString getSerialDesc(int &errcnt, QString &errstr);

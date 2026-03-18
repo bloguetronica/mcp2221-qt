@@ -108,6 +108,12 @@ void MCP2221::close()
     }
 }
 
+// Retrieves the factory serial number from the MCP2221 flash memory
+QString MCP2221::getFactorySerial(int &errcnt, QString &errstr)
+{
+    // TODO
+}
+
 // Retrieves the manufacturer descriptor from the MCP2221 flash memory
 QString MCP2221::getManufacturerDesc(int &errcnt, QString &errstr)
 {
