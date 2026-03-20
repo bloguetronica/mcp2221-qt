@@ -132,11 +132,11 @@ QString MCP2221::getFactorySerial(int &errcnt, QString &errstr)
         READ_FLASH_DATA, FACTORY_SERIAL  // Header
     };
     QVector<quint8> response = hidTransfer(command, errcnt, errstr);
-    size_t maxSize = COMMAND_SIZE - PREAMBLE_SIZE - 2;  // Maximum size (length) for the serial number
-    size_t size = response.at(2);  // Serial number actual size (length)
-    size = size > maxSize ? maxSize : size;  // This also fixes an erroneous result due to a possible unsigned integer rollover
+    size_t maxLength = COMMAND_SIZE - PREAMBLE_SIZE - 2;  // Maximum length for the serial number
+    size_t length = response.at(2);  // Serial number actual length
+    length = length > maxLength ? maxLength : length;  // This also fixes an erroneous result due to a possible unsigned integer rollover
     QString serial;
-    for (size_t i = 0; i < size; ++i) {
+    for (size_t i = 0; i < length; ++i) {
         serial += QChar(response.at(i + PREAMBLE_SIZE + 2));
     }
     return serial;
