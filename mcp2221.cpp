@@ -128,7 +128,18 @@ void MCP2221::close()
 // Retrieves the factory serial number from the MCP2221 flash memory
 QString MCP2221::getFactorySerial(int &errcnt, QString &errstr)
 {
-    // TODO
+    QVector<quint8> command{
+        READ_FLASH_DATA, FACTORY_SERIAL  // Header
+    };
+    QVector<quint8> response = hidTransfer(command, errcnt, errstr);
+    size_t maxSize = COMMAND_SIZE - PREAMBLE_SIZE - 2;  // Maximum size (length) for the serial number
+    size_t size = response.at(2);  // Serial number actual size (length)
+    size = size > maxSize ? maxSize : size;  // This also fixes an erroneous result due to a possible unsigned integer rollover
+    QString serial;
+    for (size_t i = 0; i < size; ++i) {
+        serial += QChar(response.at(i + PREAMBLE_SIZE + 2));
+    }
+    return serial;
 }
 
 // Retrieves the manufacturer descriptor from the MCP2221 flash memory
