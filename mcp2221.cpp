@@ -26,8 +26,8 @@ extern "C" {
 }
 
 // Definitions
-const quint8 EPIN = 0x81;             // Address of endpoint assuming the IN direction
-const quint8 EPOUT = 0x01;            // Address of endpoint assuming the OUT direction
+const quint8 EPIN = 0x83;             // Address of endpoint assuming the IN direction
+const quint8 EPOUT = 0x03;            // Address of endpoint assuming the OUT direction
 const unsigned int TR_TIMEOUT = 500;  // Transfer timeout in milliseconds
 
 // Private generic function that is used to get any descriptor
