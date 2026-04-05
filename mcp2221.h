@@ -63,12 +63,23 @@ public:
     static const quint8 FACTORY_SERIAL = 0x05;     // Chip factory serial number
 
     // HID command responses
-    static const quint8 COMPLETED = 0x00;      // Command completed successfully
-    static const quint8 BUSY = 0x01;           // I2C engine is busy (command not completed), or command is not supported (while reading flash memory data)
-    static const quint8 NOT_SUPPORTED = 0x02;  // Command not supported (alternate response)
-    static const quint8 NOT_ALLOWED = 0x03;    // Command not allowed
+    static const quint8 COMPLETED = 0x00;       // Command completed successfully
+    static const quint8 BUSY = 0x01;            // I2C engine is busy (command not completed)
+    static const quint8 NOT_SUPPORTED = 0x01;   // Command not supported (while reading flash memory data)
+    static const quint8 NOT_SUPPORTED2 = 0x02;  // Command not supported (alternate response)
+    static const quint8 NOT_ALLOWED = 0x03;     // Command not allowed
     //TODO
-    static const quint8 OTHER_ERROR = 0xff;    // Other error (check errcnt and errstr for details)
+    static const quint8 OTHER_ERROR = 0xff;     // Other error (check errcnt and errstr for details)
+
+    struct ChipSettings {
+        // TODO
+        quint16 vid;    // Vendor ID
+        quint16 pid;    // Product ID
+        // TODO
+
+        bool operator ==(const ChipSettings &other) const;
+        bool operator !=(const ChipSettings &other) const;
+    };
 
     explicit MCP2221();
     ~MCP2221();

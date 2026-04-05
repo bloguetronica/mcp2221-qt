@@ -87,6 +87,18 @@ quint8 MCP2221::writeDescGeneric(const QString &descriptor, quint8 subcomid, int
     return response.at(1);
 }
 
+// "Equal to" operator for ChipSettings
+bool MCP2221::ChipSettings::operator ==(const MCP2221::ChipSettings &other) const
+{
+    return vid == other.vid && pid == other.pid;  // TODO
+}
+
+// "Not equal to" operator for ChipSettings
+bool MCP2221::ChipSettings::operator !=(const MCP2221::ChipSettings &other) const
+{
+    return !(operator ==(other));
+}
+
 MCP2221::MCP2221() :
     context_(nullptr),
     handle_(nullptr),
