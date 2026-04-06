@@ -68,7 +68,7 @@ public:
     static const quint8 NOT_SUPPORTED = 0x02;  // Command not supported
     static const quint8 NOT_ALLOWED = 0x03;    // Command not allowed
     //TODO
-    static const quint8 OTHER_ERROR = 0xff;     // Other error (check errcnt and errstr for details)
+    static const quint8 OTHER_ERROR = 0xff;    // Other error (check errcnt and errstr for details)
 
     struct ChipSettings {
         // TODO
