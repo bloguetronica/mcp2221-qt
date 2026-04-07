@@ -57,6 +57,7 @@ public:
     static const quint8 WRITE_FLASH_DATA = 0xb1;  // Write flash memory data
 
     // Flash data sub-command IDs
+    static const quint8 CHIP_SETTINGS = 0x00;      // Chip settings
     static const quint8 MANUFACTURER_DESC = 0x02;  // USB manufacturer descriptor
     static const quint8 PRODUCT_DESC = 0x03;       // USB product descriptor
     static const quint8 SERIAL_DESC = 0x04;        // USB serial descriptor
@@ -87,6 +88,7 @@ public:
     bool isOpen() const;
 
     void close();
+    ChipSettings getChipSettings(int &errcnt, QString &errstr);
     QString getFactorySerial(int &errcnt, QString &errstr);
     QString getManufacturerDesc(int &errcnt, QString &errstr);
     QString getProductDesc(int &errcnt, QString &errstr);

@@ -138,6 +138,21 @@ void MCP2221::close()
     }
 }
 
+// Returns chip settings from the MCP2221 flash memory
+MCP2221::ChipSettings MCP2221::getChipSettings(int &errcnt, QString &errstr)
+{
+    QVector<quint8> command{
+        READ_FLASH_DATA, CHIP_SETTINGS  // Header
+    };
+    QVector<quint8> response = hidTransfer(command, errcnt, errstr);
+    ChipSettings settings;
+    // TODO
+    settings.vid = static_cast<quint16>(response.at(9) << 8 | response.at(8));  // Vendor ID corresponds to bytes 8 and 9 (little-endian conversion)
+    settings.pid = static_cast<quint32>(response.at(11) << 8 | response.at(10));  // Product ID corresponds to bytes 11 and 10 (little-endian conversion)
+    // TODO
+    return settings;
+}
+
 // Retrieves the factory serial number from the MCP2221 flash memory
 QString MCP2221::getFactorySerial(int &errcnt, QString &errstr)
 {
