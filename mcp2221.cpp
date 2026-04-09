@@ -223,7 +223,7 @@ QVector<quint8> MCP2221::hidTransfer(const QVector<quint8> &data, int &errcnt, Q
 int MCP2221::open(quint16 vid, quint16 pid, const QString &serial)
 {
     int retval;
-    if (isOpen()) {  // Just in case the calling algorithm tries to open a device that was already sucessfully open, or tries to open different devices concurrently, all while using (or referencing to) the same object
+    if (isOpen()) {  // Just in case the calling algorithm tries to open a device that was already successfully open, or tries to open different devices concurrently, all while using (or referencing to) the same object
         retval = SUCCESS;
     } else if (libusb_init(&context_) != 0) {  // Initialize libusb. In case of failure
         retval = ERROR_INIT;
