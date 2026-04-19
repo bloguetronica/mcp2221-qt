@@ -75,6 +75,7 @@ public:
         // TODO
         quint16 vid;    // Vendor ID
         quint16 pid;    // Product ID
+        quint8 maxpow;  // Maximum consumption current (raw value in 2 mA units)
         // TODO
 
         bool operator ==(const ChipSettings &other) const;
