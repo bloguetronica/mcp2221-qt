@@ -148,7 +148,7 @@ MCP2221::ChipSettings MCP2221::getChipSettings(int &errcnt, QString &errstr)
     ChipSettings settings;
     // TODO
     settings.vid = static_cast<quint16>(response.at(9) << 8 | response.at(8));    // Vendor ID corresponds to bytes 8 and 9 (little-endian conversion)
-    settings.pid = static_cast<quint32>(response.at(11) << 8 | response.at(10));  // Product ID corresponds to bytes 11 and 10 (little-endian conversion)
+    settings.pid = static_cast<quint32>(response.at(11) << 8 | response.at(10));  // Product ID corresponds to bytes 10 and 11 (little-endian conversion)
     settings.maxpow = response.at(13);                                            // Maximum consumption current corresponds to byte 13
     // TODO
     return settings;
