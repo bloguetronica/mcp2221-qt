@@ -40,14 +40,15 @@ private:
 
 public:
     // Class definitions
-    static const quint16 VID = 0x04d8;      // Default USB vendor ID
-    static const quint16 PID = 0x00dd;      // Default USB product ID
-    static const int SUCCESS = 0;           // Returned by open() if successful
-    static const int ERROR_INIT = 1;        // Returned by open() in case of a libusb initialization failure
-    static const int ERROR_NOT_FOUND = 2;   // Returned by open() if the device was not found
-    static const int ERROR_BUSY = 3;        // Returned by open() if the device is already in use
-    static const size_t COMMAND_SIZE = 64;  // HID command size
-    static const size_t PREAMBLE_SIZE = 2;  // HID command preamble size
+    static const quint16 VID = 0x04d8;        // Default USB vendor ID
+    static const quint16 PID = 0x00dd;        // Default USB product ID
+    static const int SUCCESS = 0;             // Returned by open() if successful
+    static const int ERROR_INIT = 1;          // Returned by open() in case of a libusb initialization failure
+    static const int ERROR_NOT_FOUND = 2;     // Returned by open() if the device was not found
+    static const int ERROR_BUSY = 3;          // Returned by open() if the device is already in use
+    static const size_t COMMAND_SIZE = 64;    // HID command size
+    static const size_t PREAMBLE_SIZE = 2;    // HID command preamble size
+    static const size_t PASSWORD_MAXLEN = 8;  // Maximum length for the password
 
     // Descriptor specific definitions
     static const size_t DESC_MAXLEN = 30;  // Maximum length for any descriptor
@@ -55,6 +56,7 @@ public:
     // HID command IDs
     static const quint8 READ_FLASH_DATA = 0xb0;   // Read flash memory data
     static const quint8 WRITE_FLASH_DATA = 0xb1;  // Write flash memory data
+    static const quint8 SEND_PASSWORD = 0xb2;     // Send password
 
     // Flash data sub-command IDs
     static const quint8 CHIP_SETTINGS = 0x00;      // Chip settings
@@ -96,6 +98,7 @@ public:
     QString getSerialDesc(int &errcnt, QString &errstr);
     QVector<quint8> hidTransfer(const QVector<quint8> &data, int &errcnt, QString &errstr);
     int open(quint16 vid, quint16 pid, const QString &serial = QString());
+    quint8 usePassword(const QString &password, int &errcnt, QString &errstr);
     quint8 writeManufacturerDesc(const QString &manufacturer, int &errcnt, QString &errstr);
     quint8 writeProductDesc(const QString &product, int &errcnt, QString &errstr);
     quint8 writeSerialDesc(const QString &product, int &errcnt, QString &errstr);

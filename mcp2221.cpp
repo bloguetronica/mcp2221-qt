@@ -261,6 +261,33 @@ int MCP2221::open(quint16 vid, quint16 pid, const QString &serial)
     return retval;
 }
 
+// Sends password over to the MCP2221
+// This function should be called before modifying a setting in the flash memory, if a password is set
+quint8 MCP2221::usePassword(const QString &password, int &errcnt, QString &errstr)
+{
+    quint8 retval;
+    QByteArray passwordLatin1 = password.toLatin1();
+    int passwordLength = passwordLatin1.size();
+    if (passwordLength > static_cast<int>(PASSWORD_MAXLEN)) {
+        ++errcnt;
+        errstr += "In usePassword(): password cannot be longer than 8 characters.\n";  // Program logic error
+        retval = OTHER_ERROR;
+    } else if (password != passwordLatin1) {
+        ++errcnt;
+        errstr += "In usePassword(): password cannot have non-latin characters.\n";  // Program logic error
+        retval = OTHER_ERROR;
+    } else {
+        QVector<quint8> command(passwordLength + PREAMBLE_SIZE);
+        command[0] = SEND_PASSWORD;  // Header
+        for (int i = 0; i < passwordLength; ++i) {
+            command[i + PREAMBLE_SIZE] = static_cast<quint8>(passwordLatin1[i]);
+        }
+        QVector<quint8> response = hidTransfer(command, errcnt, errstr);
+        retval = response.at(1);
+    }
+    return retval;
+}
+
 // Writes the manufacturer descriptor to the MCP2221 flash memory
 quint8 MCP2221::writeManufacturerDesc(const QString &manufacturer, int &errcnt, QString &errstr)
 {
