@@ -84,6 +84,14 @@ public:
         bool operator !=(const ChipSettings &other) const;
     };
 
+    struct SecurityOptions {
+        bool passwordProtected{false};  // To prevent inadvertent locking of the device, these variables are initialized to "false"
+        bool locked{false};
+
+        bool operator ==(const SecurityOptions &other) const;
+        bool operator !=(const SecurityOptions &other) const;
+    };
+
     explicit MCP2221();
     ~MCP2221();
 
@@ -95,10 +103,13 @@ public:
     QString getFactorySerial(int &errcnt, QString &errstr);
     QString getManufacturerDesc(int &errcnt, QString &errstr);
     QString getProductDesc(int &errcnt, QString &errstr);
+    SecurityOptions getSecurityOptions(int &errcnt, QString &errstr);
     QString getSerialDesc(int &errcnt, QString &errstr);
     QVector<quint8> hidTransfer(const QVector<quint8> &data, int &errcnt, QString &errstr);
     int open(quint16 vid, quint16 pid, const QString &serial = QString());
     quint8 usePassword(const QString &password, int &errcnt, QString &errstr);
+    quint8 writeChipSettings(const ChipSettings &settings, SecurityOptions &options, const QString &password, int &errcnt, QString &errstr);
+    quint8 writeChipSettings(const ChipSettings &settings, int &errcnt, QString &errstr);
     quint8 writeManufacturerDesc(const QString &manufacturer, int &errcnt, QString &errstr);
     quint8 writeProductDesc(const QString &product, int &errcnt, QString &errstr);
     quint8 writeSerialDesc(const QString &product, int &errcnt, QString &errstr);

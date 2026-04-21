@@ -99,6 +99,18 @@ bool MCP2221::ChipSettings::operator !=(const MCP2221::ChipSettings &other) cons
     return !(operator ==(other));
 }
 
+// "Equal to" operator for SecurityOptions
+bool MCP2221::SecurityOptions::operator ==(const SecurityOptions &other) const
+{
+    return passwordProtected == other.passwordProtected && locked == other.locked;
+}
+
+// "Not equal to" operator for SecurityOptions
+bool MCP2221::SecurityOptions::operator !=(const MCP2221::SecurityOptions &other) const
+{
+    return !(operator ==(other));
+}
+
 MCP2221::MCP2221() :
     context_(nullptr),
     handle_(nullptr),
@@ -181,6 +193,16 @@ QString MCP2221::getManufacturerDesc(int &errcnt, QString &errstr)
 QString MCP2221::getProductDesc(int &errcnt, QString &errstr)
 {
     return getDescGeneric(PRODUCT_DESC, errcnt, errstr);
+}
+
+// Retrieves security flags from the MCP2221 flash memory
+MCP2221::SecurityOptions MCP2221::getSecurityOptions(int &errcnt, QString &errstr)
+{
+    QVector<quint8> command{
+        READ_FLASH_DATA, CHIP_SETTINGS  // Header
+    };
+    QVector<quint8> response = hidTransfer(command, errcnt, errstr);
+    //return response.at(2);  // Security flags corresponds to byte 2 (TODO)
 }
 
 // Retrieves the serial descriptor from the MCP2221 flash memory
@@ -286,6 +308,50 @@ quint8 MCP2221::usePassword(const QString &password, int &errcnt, QString &errst
         retval = response.at(1);
     }
     return retval;
+}
+
+// Writes the given chip transfer settings to the MCP2221 flash memory, while also setting the security options and the password
+// Note that using an empty string for the password will have the effect of leaving it unchanged (TODO verify this!)
+quint8 MCP2221::writeChipSettings(const ChipSettings &settings, SecurityOptions &options, const QString &password, int &errcnt, QString &errstr)
+{
+    quint8 retval;
+    QByteArray passwordLatin1 = password.toLatin1();
+    int passwordLength = passwordLatin1.size();
+    if (passwordLength > static_cast<int>(PASSWORD_MAXLEN)) {
+        ++errcnt;
+        errstr += "In writeChipSettings(): password cannot be longer than 8 characters.\n";  // Program logic error
+        retval = OTHER_ERROR;
+    } else if (password != passwordLatin1) {
+        ++errcnt;
+        errstr += "In writeChipSettings(): password cannot have non-latin characters.\n";  // Program logic error
+        retval = OTHER_ERROR;
+    } else {
+        QVector<quint8> command(passwordLength + 12);
+        command[0] = WRITE_FLASH_DATA;                                 // Header
+        command[1] = CHIP_SETTINGS;
+        //command[2] =                                                 // TODO something and security flags
+        //TODO
+        command[6] = static_cast<quint8>(settings.vid);                // Vendor ID
+        command[7] = static_cast<quint8>(settings.vid >> 8);
+        command[8] = static_cast<quint8>(settings.pid);                // Product ID
+        command[9] = static_cast<quint8>(settings.pid >> 8);
+        //TODO
+        command[11] = settings.maxpow;                                 // Maximum consumption current
+        for (int i = 0; i < passwordLength; ++i) {
+            command[i + 12] = static_cast<quint8>(passwordLatin1[i]);
+        }
+        QVector<quint8> response = hidTransfer(command, errcnt, errstr);
+        retval = response.at(1);
+    }
+    return retval;
+}
+
+// Writes the given chip transfer settings to the MCP2221 flash memory
+// The use of this variant of writeNVChipSettings() doesn't set any security options and the password is kept unchanged (TODO verify this!)
+quint8 MCP2221::writeChipSettings(const ChipSettings &settings, int &errcnt, QString &errstr)
+{
+    SecurityOptions nosec;  // By default, when declaring a "SecurityOptions" type of variable, no security flags are set (TODO test this!)
+    return writeChipSettings(settings, nosec, "", errcnt, errstr);
 }
 
 // Writes the manufacturer descriptor to the MCP2221 flash memory
