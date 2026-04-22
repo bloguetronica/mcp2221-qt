@@ -330,16 +330,16 @@ quint8 MCP2221::writeChipSettings(const ChipSettings &settings, SecurityOptions 
         retval = OTHER_ERROR;
     } else {
         QVector<quint8> command(passwordLength + 12);
-        command[0] = WRITE_FLASH_DATA;                                 // Header
+        command[0] = WRITE_FLASH_DATA;                                           // Header
         command[1] = CHIP_SETTINGS;
-        //command[2] =                                                 // TODO something and security flags
+        command[2] = static_cast<quint8>(options.lock << 1 | options.password);  // TODO something and security flags
         //TODO
-        command[6] = static_cast<quint8>(settings.vid);                // Vendor ID
+        command[6] = static_cast<quint8>(settings.vid);                          // Vendor ID
         command[7] = static_cast<quint8>(settings.vid >> 8);
-        command[8] = static_cast<quint8>(settings.pid);                // Product ID
+        command[8] = static_cast<quint8>(settings.pid);                          // Product ID
         command[9] = static_cast<quint8>(settings.pid >> 8);
         //TODO
-        command[11] = settings.maxpow;                                 // Maximum consumption current
+        command[11] = settings.maxpow;                                           // Maximum consumption current
         for (int i = 0; i < passwordLength; ++i) {
             command[i + 12] = static_cast<quint8>(passwordLatin1[i]);
         }
