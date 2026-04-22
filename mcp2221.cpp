@@ -102,7 +102,7 @@ bool MCP2221::ChipSettings::operator !=(const MCP2221::ChipSettings &other) cons
 // "Equal to" operator for SecurityOptions
 bool MCP2221::SecurityOptions::operator ==(const SecurityOptions &other) const
 {
-    return passwordProtected == other.passwordProtected && locked == other.locked;
+    return password == other.password && lock == other.lock;
 }
 
 // "Not equal to" operator for SecurityOptions
@@ -202,7 +202,10 @@ MCP2221::SecurityOptions MCP2221::getSecurityOptions(int &errcnt, QString &errst
         READ_FLASH_DATA, CHIP_SETTINGS  // Header
     };
     QVector<quint8> response = hidTransfer(command, errcnt, errstr);
-    //return response.at(2);  // Security flags corresponds to byte 2 (TODO)
+    SecurityOptions retval;
+    retval.password = (0x01 & response.at(4)) != 0x00;  // Password security flag corresponds to bit 0 of byte 4
+    retval.lock = (0x02 & response.at(4)) != 0x00;      // Lock security flag corresponds to bit 1 of byte 4
+    return retval;
 }
 
 // Retrieves the serial descriptor from the MCP2221 flash memory

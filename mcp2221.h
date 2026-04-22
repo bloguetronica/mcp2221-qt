@@ -85,8 +85,8 @@ public:
     };
 
     struct SecurityOptions {
-        bool passwordProtected{false};  // To prevent inadvertent locking of the device, these variables are initialized to "false"
-        bool locked{false};
+        bool password{false};  // To prevent inadvertent locking of the device, these variables are initialized to "false"
+        bool lock{false};
 
         bool operator ==(const SecurityOptions &other) const;
         bool operator !=(const SecurityOptions &other) const;
