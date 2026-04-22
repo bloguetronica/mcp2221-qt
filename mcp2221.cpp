@@ -350,7 +350,7 @@ quint8 MCP2221::writeChipSettings(const ChipSettings &settings, SecurityOptions 
 // The use of this variant of writeNVChipSettings() doesn't set any security options and the password is kept unchanged (TODO verify this!)
 quint8 MCP2221::writeChipSettings(const ChipSettings &settings, int &errcnt, QString &errstr)
 {
-    SecurityOptions nosec;  // By default, when declaring a "SecurityOptions" type of variable, no security flags are set (TODO test this!)
+    SecurityOptions nosec;  // By default, when declaring a "SecurityOptions" type of variable, no security flags are set
     return writeChipSettings(settings, nosec, "", errcnt, errstr);
 }
 
