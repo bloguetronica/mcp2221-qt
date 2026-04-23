@@ -73,12 +73,17 @@ public:
     //TODO
     static const quint8 OTHER_ERROR = 0xff;    // Other error (check errcnt and errstr for details)
 
+    // The following values are applicable to ChipSettings/getChipSettings()/writeChipSettings()
+    static const bool PMBUS = false;  // Value corresponding to USB bus-powered mode
+    static const bool PMSELF = true;  // Value corresponding to USB self-powered mode
+
     struct ChipSettings {
         // TODO
         quint16 vid;    // Vendor ID
         quint16 pid;    // Product ID
         quint8 maxpow;  // Maximum consumption current (raw value in 2 mA units)
-        // TODO
+        bool powmode;   // Power mode (false for bus-powered, true for self-powered)
+        bool rmwakeup;  // Remote wake-up capability
 
         bool operator ==(const ChipSettings &other) const;
         bool operator !=(const ChipSettings &other) const;
