@@ -90,7 +90,7 @@ quint8 MCP2221::writeDescGeneric(const QString &descriptor, quint8 subcomid, int
 // "Equal to" operator for ChipSettings
 bool MCP2221::ChipSettings::operator ==(const MCP2221::ChipSettings &other) const
 {
-    return vid == other.vid && pid == other.pid && maxpow == other.maxpow;  // TODO
+    return serialen == other.serialen && vid == other.vid && pid == other.pid && maxpow == other.maxpow && powmode == other.powmode && rmwakeup == other.rmwakeup;  // TODO
 }
 
 // "Not equal to" operator for ChipSettings
@@ -159,6 +159,7 @@ MCP2221::ChipSettings MCP2221::getChipSettings(int &errcnt, QString &errstr)
     QVector<quint8> response = hidTransfer(command, errcnt, errstr);
     ChipSettings settings;
     // TODO
+    settings.serialen = (0x80 & response.at(4)) != 0x00;                          // Serial number eneble corresponds to bit 7 of byte 4
     settings.vid = static_cast<quint16>(response.at(9) << 8 | response.at(8));    // Vendor ID corresponds to bytes 8 and 9 (little-endian conversion)
     settings.pid = static_cast<quint32>(response.at(11) << 8 | response.at(10));  // Product ID corresponds to bytes 10 and 11 (little-endian conversion)
     settings.maxpow = response.at(13);                                            // Maximum consumption current corresponds to byte 13
@@ -331,16 +332,16 @@ quint8 MCP2221::writeChipSettings(const ChipSettings &settings, SecurityOptions 
         retval = OTHER_ERROR;
     } else {
         QVector<quint8> command(passwordLength + 12);
-        command[0] = WRITE_FLASH_DATA;                                                             // Header
+        command[0] = WRITE_FLASH_DATA;                                                                    // Header
         command[1] = CHIP_SETTINGS;
-        command[2] = static_cast<quint8>(options.lock << 1 | options.password);                    // TODO something and security flags
+        command[2] = static_cast<quint8>(settings.serialen << 7 | options.lock << 1 | options.password);  // Serial enable and security flags
         //TODO
-        command[6] = static_cast<quint8>(settings.vid);                                            // Vendor ID
+        command[6] = static_cast<quint8>(settings.vid);                                                   // Vendor ID
         command[7] = static_cast<quint8>(settings.vid >> 8);
-        command[8] = static_cast<quint8>(settings.pid);                                            // Product ID
+        command[8] = static_cast<quint8>(settings.pid);                                                   // Product ID
         command[9] = static_cast<quint8>(settings.pid >> 8);
-        command[10] = static_cast<quint8>(0x80 | settings.powmode << 6 | settings.rmwakeup << 5),  // Chip power options
-        command[11] = settings.maxpow;                                                             // Maximum consumption current
+        command[10] = static_cast<quint8>(0x80 | settings.powmode << 6 | settings.rmwakeup << 5),         // Chip power options
+        command[11] = settings.maxpow;                                                                    // Maximum consumption current
         for (int i = 0; i < passwordLength; ++i) {
             command[i + 12] = static_cast<quint8>(passwordLatin1[i]);
         }

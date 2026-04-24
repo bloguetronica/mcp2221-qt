@@ -79,6 +79,7 @@ public:
 
     struct ChipSettings {
         // TODO
+        bool serialen;  // Serial number enable
         quint16 vid;    // Vendor ID
         quint16 pid;    // Product ID
         quint8 maxpow;  // Maximum consumption current (raw value in 2 mA units)
