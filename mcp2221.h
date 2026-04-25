@@ -77,14 +77,49 @@ public:
     static const bool PMBUS = false;  // Value corresponding to USB bus-powered mode
     static const bool PMSELF = true;  // Value corresponding to USB self-powered mode
 
-    struct ChipSettings {
-        // TODO
+    struct InterruptParameters {
+        bool detpos;  // Detect positive (rising) edge
+        bool detneg;  // Detect negative (falling) edge
+
+        bool operator ==(const InterruptParameters &other) const;
+        bool operator !=(const InterruptParameters &other) const;
+    };
+
+    struct ADCParameters {
+        quint8 refvolt;  // ADC reference voltage
+        bool refopt;     // ADC reference option
+
+        bool operator ==(const ADCParameters &other) const;
+        bool operator !=(const ADCParameters &other) const;
+    };
+
+    struct DACParameters{
+        quint8 refvolt;  // DAC reference voltage
+        bool refopt;     // DAC reference option
+        quint8 defval;   // DAC default value on power-up
+
+        bool operator ==(const DACParameters &other) const;
+        bool operator !=(const DACParameters &other) const;
+    };
+
+    struct USBParameters {
         bool serialen;  // Serial number enable
         quint16 vid;    // Vendor ID
         quint16 pid;    // Product ID
         quint8 maxpow;  // Maximum consumption current (raw value in 2 mA units)
         bool powmode;   // Power mode (false for bus-powered, true for self-powered)
         bool rmwakeup;  // Remote wake-up capability
+
+        bool operator ==(const USBParameters &other) const;
+        bool operator !=(const USBParameters &other) const;
+    };
+
+    struct ChipSettings {
+        quint8 clockdiv;           // Clock output divider
+        InterruptParameters intr;  // Interrupt parameters
+        ADCParameters adc;         // ADC parameters
+        DACParameters dac;         // DAC parameters
+        USBParameters usb;         // USB parameters
 
         bool operator ==(const ChipSettings &other) const;
         bool operator !=(const ChipSettings &other) const;

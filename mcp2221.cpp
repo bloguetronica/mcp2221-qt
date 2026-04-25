@@ -87,10 +87,58 @@ quint8 MCP2221::writeDescGeneric(const QString &descriptor, quint8 subcomid, int
     return response.at(1);
 }
 
+// "Equal to" operator for InterruptParameters
+bool MCP2221::InterruptParameters::operator ==(const MCP2221::InterruptParameters &other) const
+{
+    return detpos == other.detpos && detneg == other.detneg;
+}
+
+// "Not equal to" operator for InterruptParameters
+bool MCP2221::InterruptParameters::operator !=(const InterruptParameters &other) const
+{
+    return !(operator ==(other));
+}
+
+// "Equal to" operator for ADCParameters
+bool MCP2221::ADCParameters::operator ==(const MCP2221::ADCParameters &other) const
+{
+    return refvolt == other.refvolt && refopt == other.refopt;
+}
+
+// "Not equal to" operator for ADCParameters
+bool MCP2221::ADCParameters::operator !=(const MCP2221::ADCParameters &other) const
+{
+    return !(operator ==(other));
+}
+
+// "Equal to" operator for DACParameters
+bool MCP2221::DACParameters::operator ==(const MCP2221::DACParameters &other) const
+{
+    return refvolt == other.refvolt && refopt == other.refopt && defval == other.defval;
+}
+
+// "Not equal to" operator for DACParameters
+bool MCP2221::DACParameters::operator !=(const MCP2221::DACParameters &other) const
+{
+    return !(operator ==(other));
+}
+
+// "Equal to" operator for USBParameters
+bool MCP2221::USBParameters::operator ==(const MCP2221::USBParameters &other) const
+{
+    return serialen == other.serialen && vid == other.vid && pid == other.pid && maxpow == other.maxpow && powmode == other.powmode && rmwakeup == other.rmwakeup;
+}
+
+// "Not equal to" operator for USBParameters
+bool MCP2221::USBParameters::operator !=(const MCP2221::USBParameters &other) const
+{
+    return !(operator ==(other));
+}
+
 // "Equal to" operator for ChipSettings
 bool MCP2221::ChipSettings::operator ==(const MCP2221::ChipSettings &other) const
 {
-    return serialen == other.serialen && vid == other.vid && pid == other.pid && maxpow == other.maxpow && powmode == other.powmode && rmwakeup == other.rmwakeup;  // TODO
+    return clockdiv == other.clockdiv && intr == other.intr && adc == other.adc && dac == other.dac && usb == other.usb;
 }
 
 // "Not equal to" operator for ChipSettings
@@ -158,13 +206,20 @@ MCP2221::ChipSettings MCP2221::getChipSettings(int &errcnt, QString &errstr)
     };
     QVector<quint8> response = hidTransfer(command, errcnt, errstr);
     ChipSettings settings;
-    // TODO
-    settings.serialen = (0x80 & response.at(4)) != 0x00;                          // Serial number eneble corresponds to bit 7 of byte 4
-    settings.vid = static_cast<quint16>(response.at(9) << 8 | response.at(8));    // Vendor ID corresponds to bytes 8 and 9 (little-endian conversion)
-    settings.pid = static_cast<quint32>(response.at(11) << 8 | response.at(10));  // Product ID corresponds to bytes 10 and 11 (little-endian conversion)
-    settings.maxpow = response.at(13);                                            // Maximum consumption current corresponds to byte 13
-    settings.powmode = (0x40 & response.at(12)) != 0x00;                          // Power mode corresponds to bit 6 of byte 12
-    settings.rmwakeup = (0x20 & response.at(12)) != 0x00;                         // Remote wake-up capability corresponds to bit 5 of byte 12
+    settings.clockdiv = static_cast<quint8>(0x1f & response.at(5));                   // Clock divider corresponds to bits 4:0 of byte 5
+    settings.intr.detpos = (0x20 & response.at(7)) != 0x00;                           // Interrupt detection on positive edge corresponds to bit 5 of byte 7
+    settings.intr.detneg = (0x40 & response.at(7)) != 0x00;                           // Interrupt detection on negative edge corresponds to bit 6 of byte 7
+    settings.adc.refvolt = static_cast<quint8>(0x03 & response.at(6) >> 3);           // ADC reference voltage corresponds to bits 4:3 of byte 7
+    settings.adc.refopt = (0x04 & response.at(7)) != 0x00;                            // ADC reference option corresponds to bit 2 of byte 7
+    settings.dac.refvolt = static_cast<quint8>(0x03 & response.at(6) >> 6);           // DAC reference voltage corresponds to bits 7:6 of byte 6
+    settings.dac.refopt = (0x20 & response.at(6)) != 0x00;                            // DAC reference option corresponds to bit 5 of byte 6
+    settings.dac.defval = static_cast<quint8>(0x1f & response.at(6));                 // DAC default value corresponds to bits 4:0 of byte 6
+    settings.usb.serialen = (0x80 & response.at(4)) != 0x00;                          // Serial number eneble corresponds to bit 7 of byte 4
+    settings.usb.vid = static_cast<quint16>(response.at(9) << 8 | response.at(8));    // Vendor ID corresponds to bytes 8 and 9 (little-endian conversion)
+    settings.usb.pid = static_cast<quint32>(response.at(11) << 8 | response.at(10));  // Product ID corresponds to bytes 10 and 11 (little-endian conversion)
+    settings.usb.maxpow = response.at(13);                                            // Maximum consumption current corresponds to byte 13
+    settings.usb.powmode = (0x40 & response.at(12)) != 0x00;                          // Power mode corresponds to bit 6 of byte 12
+    settings.usb.rmwakeup = (0x20 & response.at(12)) != 0x00;                         // Remote wake-up capability corresponds to bit 5 of byte 12
     return settings;
 }
 
@@ -332,16 +387,18 @@ quint8 MCP2221::writeChipSettings(const ChipSettings &settings, SecurityOptions 
         retval = OTHER_ERROR;
     } else {
         QVector<quint8> command(passwordLength + 12);
-        command[0] = WRITE_FLASH_DATA;                                                                    // Header
+        command[0] = WRITE_FLASH_DATA;                                                                                                                             // Header
         command[1] = CHIP_SETTINGS;
-        command[2] = static_cast<quint8>(settings.serialen << 7 | options.lock << 1 | options.password);  // Serial enable and security flags
-        //TODO
-        command[6] = static_cast<quint8>(settings.vid);                                                   // Vendor ID
-        command[7] = static_cast<quint8>(settings.vid >> 8);
-        command[8] = static_cast<quint8>(settings.pid);                                                   // Product ID
-        command[9] = static_cast<quint8>(settings.pid >> 8);
-        command[10] = static_cast<quint8>(0x80 | settings.powmode << 6 | settings.rmwakeup << 5),         // Chip power options
-        command[11] = settings.maxpow;                                                                    // Maximum consumption current
+        command[2] = static_cast<quint8>(settings.usb.serialen << 7 | options.lock << 1 | options.password);                                                       // Serial enable and security flags
+        command[3] = static_cast<quint8>(0x1f & settings.clockdiv);                                                                                                // Clock output divider
+        command[4] = static_cast<quint8>((0x03 & settings.dac.refvolt) << 6 | settings.dac.refopt << 4 | (0x1f & settings.dac.defval));                            // DAC parameters
+        command[5] = static_cast<quint8>(settings.intr.detneg << 6 | settings.intr.detpos << 5 | (0x03 & settings.adc.refvolt) << 3 |  settings.dac.refopt << 2);  // Interrupt and ADC parameters
+        command[6] = static_cast<quint8>(settings.usb.vid);                                                                                                        // Vendor ID
+        command[7] = static_cast<quint8>(settings.usb.vid >> 8);
+        command[8] = static_cast<quint8>(settings.usb.pid);                                                                                                        // Product ID
+        command[9] = static_cast<quint8>(settings.usb.pid >> 8);
+        command[10] = static_cast<quint8>(0x80 | settings.usb.powmode << 6 | settings.usb.rmwakeup << 5),                                                          // Chip power options
+        command[11] = settings.usb.maxpow;                                                                                                                         // Maximum consumption current
         for (int i = 0; i < passwordLength; ++i) {
             command[i + 12] = static_cast<quint8>(passwordLatin1[i]);
         }
