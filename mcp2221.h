@@ -77,14 +77,6 @@ public:
     static const bool PMBUS = false;  // Value corresponding to USB bus-powered mode
     static const bool PMSELF = true;  // Value corresponding to USB self-powered mode
 
-    struct InterruptParameters {
-        bool detpos;  // Detect positive (rising) edge
-        bool detneg;  // Detect negative (falling) edge
-
-        bool operator ==(const InterruptParameters &other) const;
-        bool operator !=(const InterruptParameters &other) const;
-    };
-
     struct ADCParameters {
         quint8 refvolt;  // ADC reference voltage
         bool refopt;     // ADC reference option
@@ -100,6 +92,14 @@ public:
 
         bool operator ==(const DACParameters &other) const;
         bool operator !=(const DACParameters &other) const;
+    };
+
+    struct InterruptParameters {
+        bool detpos;  // Detect positive (rising) edge
+        bool detneg;  // Detect negative (falling) edge
+
+        bool operator ==(const InterruptParameters &other) const;
+        bool operator !=(const InterruptParameters &other) const;
     };
 
     struct USBParameters {

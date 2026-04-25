@@ -87,18 +87,6 @@ quint8 MCP2221::writeDescGeneric(const QString &descriptor, quint8 subcomid, int
     return response.at(1);
 }
 
-// "Equal to" operator for InterruptParameters
-bool MCP2221::InterruptParameters::operator ==(const MCP2221::InterruptParameters &other) const
-{
-    return detpos == other.detpos && detneg == other.detneg;
-}
-
-// "Not equal to" operator for InterruptParameters
-bool MCP2221::InterruptParameters::operator !=(const InterruptParameters &other) const
-{
-    return !(operator ==(other));
-}
-
 // "Equal to" operator for ADCParameters
 bool MCP2221::ADCParameters::operator ==(const MCP2221::ADCParameters &other) const
 {
@@ -119,6 +107,18 @@ bool MCP2221::DACParameters::operator ==(const MCP2221::DACParameters &other) co
 
 // "Not equal to" operator for DACParameters
 bool MCP2221::DACParameters::operator !=(const MCP2221::DACParameters &other) const
+{
+    return !(operator ==(other));
+}
+
+// "Equal to" operator for InterruptParameters
+bool MCP2221::InterruptParameters::operator ==(const MCP2221::InterruptParameters &other) const
+{
+    return detpos == other.detpos && detneg == other.detneg;
+}
+
+// "Not equal to" operator for InterruptParameters
+bool MCP2221::InterruptParameters::operator !=(const InterruptParameters &other) const
 {
     return !(operator ==(other));
 }
