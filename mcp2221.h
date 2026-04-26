@@ -73,10 +73,25 @@ public:
     //TODO
     static const quint8 OTHER_ERROR = 0xff;    // Other error (check errcnt and errstr for details)
 
-    // The following values are applicable to ChipSettings/getChipSettings()/writeChipSettings()
+    // The following values are applicable to ChipSettings.ADCParameters/getChipSettings()/writeChipSettings()
+    static const bool ADREFVRM = false;  // ADC reference set to Vrm
+    static const bool ADREFVDD = true;   // ADC reference set to Vdd
+
+    // The following values are applicable to ChipSettings.DACParameters/getChipSettings()/writeChipSettings()
+    static const bool DAREFVDD = false;  // DAC reference set to Vdd
+    static const bool DAREFVRM = true;   // DAC reference set to Vrm
+
+    // The following values are applicable to ChipSettings.ADCParameters/ChipSettings.DACParameters/getChipSettings()/writeChipSettings()
+    static const quint8 REFOFF = 0x00;    // Reference voltage set to be off
+    static const quint8 REF1V024 = 0x01;  // Value corresponding to reference voltage of 1.024V
+    static const quint8 REF2V048 = 0x02;  // Value corresponding to reference voltage of 2.048V
+    static const quint8 REF4V096 = 0x03;  // Value corresponding to reference voltage of 4.096V
+
+    // The following values are applicable to ChipSettings.USBParameters/getChipSettings()/writeChipSettings()
     static const bool PMBUS = false;  // Value corresponding to USB bus-powered mode
     static const bool PMSELF = true;  // Value corresponding to USB self-powered mode
 
+    // Member of ChipSettings
     struct ADCParameters {
         quint8 refvolt;  // ADC reference voltage
         bool refopt;     // ADC reference option
@@ -85,6 +100,7 @@ public:
         bool operator !=(const ADCParameters &other) const;
     };
 
+    // Member of ChipSettings
     struct DACParameters{
         quint8 refvolt;  // DAC reference voltage
         bool refopt;     // DAC reference option
@@ -94,6 +110,7 @@ public:
         bool operator !=(const DACParameters &other) const;
     };
 
+    // Member of ChipSettings
     struct InterruptParameters {
         bool detpos;  // Detect positive (rising) edge
         bool detneg;  // Detect negative (falling) edge
@@ -102,6 +119,7 @@ public:
         bool operator !=(const InterruptParameters &other) const;
     };
 
+    // Member of ChipSettings
     struct USBParameters {
         bool serialen;  // Serial number enable
         quint16 vid;    // Vendor ID
