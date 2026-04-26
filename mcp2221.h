@@ -73,19 +73,13 @@ public:
     //TODO
     static const quint8 OTHER_ERROR = 0xff;    // Other error (check errcnt and errstr for details)
 
-    // The following values are applicable to ChipSettings.ADCParameters/getChipSettings()/writeChipSettings()
-    static const bool ADREFVRM = false;  // ADC reference set to Vrm
-    static const bool ADREFVDD = true;   // ADC reference set to Vdd
-
-    // The following values are applicable to ChipSettings.DACParameters/getChipSettings()/writeChipSettings()
-    static const bool DAREFVDD = false;  // DAC reference set to Vdd
-    static const bool DAREFVRM = true;   // DAC reference set to Vrm
-
     // The following values are applicable to ChipSettings.ADCParameters/ChipSettings.DACParameters/getChipSettings()/writeChipSettings()
     static const quint8 REFOFF = 0x00;    // Reference voltage set to be off
     static const quint8 REF1V024 = 0x01;  // Value corresponding to reference voltage of 1.024V
     static const quint8 REF2V048 = 0x02;  // Value corresponding to reference voltage of 2.048V
     static const quint8 REF4V096 = 0x03;  // Value corresponding to reference voltage of 4.096V
+    static const bool REFOPVDD = false;   // ADC or DAC reference set to Vdd
+    static const bool REFOPVRM = true;    // ADC or DAC reference set to Vrm
 
     // The following values are applicable to ChipSettings.USBParameters/getChipSettings()/writeChipSettings()
     static const bool PMBUS = false;  // Value corresponding to USB bus-powered mode
