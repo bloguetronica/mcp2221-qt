@@ -74,12 +74,12 @@ public:
     static const quint8 OTHER_ERROR = 0xff;    // Other error (check errcnt and errstr for details)
 
     // The following values are applicable to ChipSettings.ADCParameters/ChipSettings.DACParameters/getChipSettings()/writeChipSettings()
-    static const quint8 REFOFF = 0x00;    // Reference voltage set to be off
-    static const quint8 REF1V024 = 0x01;  // Value corresponding to reference voltage of 1.024V
-    static const quint8 REF2V048 = 0x02;  // Value corresponding to reference voltage of 2.048V
-    static const quint8 REF4V096 = 0x03;  // Value corresponding to reference voltage of 4.096V
-    static const bool REFOPVDD = false;   // ADC or DAC reference set to Vdd
-    static const bool REFOPVRM = true;    // ADC or DAC reference set to Vrm
+    static const quint8 VRMOFF = 0x00;    // Internal voltage reference (VRM) set to be off
+    static const quint8 VRM1V024 = 0x01;  // Value corresponding to a reference voltage (Vrm) of 1.024V
+    static const quint8 VRM2V048 = 0x02;  // Value corresponding to a reference voltage (Vrm) of 2.048V
+    static const quint8 VRM4V096 = 0x03;  // Value corresponding to a reference voltage (Vrm) of 4.096V
+    static const bool REFOPTVDD = false;  // ADC or DAC reference set to Vdd
+    static const bool REFOPTVRM = true;   // ADC or DAC reference set to Vrm
 
     // The following values are applicable to ChipSettings.USBParameters/getChipSettings()/writeChipSettings()
     static const bool PMBUS = false;  // Value corresponding to USB bus-powered mode
@@ -87,8 +87,8 @@ public:
 
     // Member of ChipSettings
     struct ADCParameters {
-        quint8 refvolt;  // ADC reference voltage
-        bool refopt;     // ADC reference option
+        quint8 vrm;   // ADC reference voltage (Vrm)
+        bool refopt;  // ADC reference option
 
         bool operator ==(const ADCParameters &other) const;
         bool operator !=(const ADCParameters &other) const;
@@ -96,9 +96,9 @@ public:
 
     // Member of ChipSettings
     struct DACParameters{
-        quint8 refvolt;  // DAC reference voltage
-        bool refopt;     // DAC reference option
-        quint8 defval;   // DAC default value on power-up
+        quint8 vrm;     // DAC reference voltage (Vrm)
+        bool refopt;    // DAC reference option
+        quint8 defval;  // DAC default value on power-up
 
         bool operator ==(const DACParameters &other) const;
         bool operator !=(const DACParameters &other) const;
