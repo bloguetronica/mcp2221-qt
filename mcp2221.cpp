@@ -147,6 +147,30 @@ bool MCP2221::ChipSettings::operator !=(const MCP2221::ChipSettings &other) cons
     return !(operator ==(other));
 }
 
+// "Equal to" operator for GPPinParameters
+bool MCP2221::GPPinParameters::operator ==(const MCP2221::GPPinParameters &other) const
+{
+    return func == other.func && dir == other.dir && out == other.out;
+}
+
+// "Not equal to" operator for GPPinParameters
+bool MCP2221::GPPinParameters::operator !=(const MCP2221::GPPinParameters &other) const
+{
+    return !(operator ==(other));
+}
+
+// "Equal to" operator for GPSettings
+bool MCP2221::GPSettings::operator ==(const MCP2221::GPSettings &other) const
+{
+    return gp0 == other.gp0 && gp1 == other.gp1 && gp2 == other.gp2 && gp3 == other.gp3;
+}
+
+// "Not equal to" operator for GPSettings
+bool MCP2221::GPSettings::operator !=(const MCP2221::GPSettings &other) const
+{
+    return !(operator ==(other));
+}
+
 // "Equal to" operator for SecurityOptions
 bool MCP2221::SecurityOptions::operator ==(const SecurityOptions &other) const
 {

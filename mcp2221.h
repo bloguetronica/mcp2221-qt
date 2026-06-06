@@ -137,6 +137,26 @@ public:
         bool operator !=(const ChipSettings &other) const;
     };
 
+    // Menber of GPSettings
+    struct GPPinParameters {
+        quint8 func;
+        bool dir;
+        bool out;
+
+        bool operator ==(const GPPinParameters &other) const;
+        bool operator !=(const GPPinParameters &other) const;
+    };
+
+    struct GPSettings {
+        GPPinParameters gp0;
+        GPPinParameters gp1;
+        GPPinParameters gp2;
+        GPPinParameters gp3;
+
+        bool operator ==(const GPSettings &other) const;
+        bool operator !=(const GPSettings &other) const;
+    };
+
     struct SecurityOptions {
         bool password{false};  // To prevent inadvertent locking of the device, these variables are initialized to "false"
         bool lock{false};
