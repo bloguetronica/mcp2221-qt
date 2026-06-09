@@ -85,6 +85,15 @@ public:
     static const bool PMBUS = false;  // Value corresponding to USB bus-powered mode
     static const bool PMSELF = true;  // Value corresponding to USB self-powered mode
 
+    // The following values are applicable to GPSettings.GPPinParameters/getGPSettings()/writeGPSettings()
+    static const quint8 FNGPIO = 0x00;  // Pin configured as GPIO
+    static const quint8 FNDED = 0x01;   // Pin configured as a dedicated function pin
+    static const quint8 FNALT0 = 0x02;  // Pin assigned to alternate function 0
+    static const quint8 FNALT1 = 0x03;  // Pin assigned to alternate function 1
+    static const quint8 FNALT2 = 0x04;  // Pin assigned to alternate function 2
+    static const bool DIROUT = false;   // Pin direction set to output
+    static const bool DIRIN = true;     // Pin direction set to input
+
     // Member of ChipSettings
     struct ADCParameters {
         quint8 vrm;   // ADC reference voltage (Vrm)
