@@ -247,6 +247,12 @@ MCP2221::ChipSettings MCP2221::getChipSettings(int &errcnt, QString &errstr)
     return settings;
 }
 
+// Returns GP pin settings from the MCP2221 flash memory
+MCP2221::GPSettings getGPSettings(int &errcnt, QString &errstr)
+{
+    // TODO
+}
+
 // Retrieves the factory serial number from the MCP2221 flash memory
 QString MCP2221::getFactorySerial(int &errcnt, QString &errstr)
 {
@@ -394,7 +400,7 @@ quint8 MCP2221::usePassword(const QString &password, int &errcnt, QString &errst
     return retval;
 }
 
-// Writes the given chip transfer settings to the MCP2221 flash memory, while also setting the security options and the password
+// Writes the given chip settings to the MCP2221 flash memory, while also setting the security options and the password
 // Note that using an empty string for the password will have the effect of leaving it unchanged (TODO verify this!)
 quint8 MCP2221::writeChipSettings(const ChipSettings &settings, SecurityOptions &options, const QString &password, int &errcnt, QString &errstr)
 {
@@ -432,12 +438,20 @@ quint8 MCP2221::writeChipSettings(const ChipSettings &settings, SecurityOptions 
     return retval;
 }
 
-// Writes the given chip transfer settings to the MCP2221 flash memory
+// Writes the given chip settings to the MCP2221 flash memory
 // The use of this variant of writeNVChipSettings() doesn't set any security options and the password is kept unchanged (TODO verify this!)
 quint8 MCP2221::writeChipSettings(const ChipSettings &settings, int &errcnt, QString &errstr)
 {
     SecurityOptions nosec;  // By default, when declaring a "SecurityOptions" type of variable, no security flags are set
     return writeChipSettings(settings, nosec, "", errcnt, errstr);
+}
+
+// Writes the given GP pin settings to the MCP2221 flash memory
+quint8 MCP2221::writeGPSettings(const GPSettings &settings, int &errcnt, QString &errstr)
+{
+    quint8 retval;
+    // TODO
+    return retval;
 }
 
 // Writes the manufacturer descriptor to the MCP2221 flash memory

@@ -182,6 +182,7 @@ public:
 
     void close();
     ChipSettings getChipSettings(int &errcnt, QString &errstr);
+    GPSettings getGPSettings(int &errcnt, QString &errstr);
     QString getFactorySerial(int &errcnt, QString &errstr);
     QString getManufacturerDesc(int &errcnt, QString &errstr);
     QString getProductDesc(int &errcnt, QString &errstr);
@@ -192,6 +193,7 @@ public:
     quint8 usePassword(const QString &password, int &errcnt, QString &errstr);
     quint8 writeChipSettings(const ChipSettings &settings, SecurityOptions &options, const QString &password, int &errcnt, QString &errstr);
     quint8 writeChipSettings(const ChipSettings &settings, int &errcnt, QString &errstr);
+    quint8 writeGPSettings(const GPSettings &settings, int &errcnt, QString &errstr);
     quint8 writeManufacturerDesc(const QString &manufacturer, int &errcnt, QString &errstr);
     quint8 writeProductDesc(const QString &product, int &errcnt, QString &errstr);
     quint8 writeSerialDesc(const QString &product, int &errcnt, QString &errstr);
