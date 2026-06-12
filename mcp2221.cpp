@@ -248,9 +248,26 @@ MCP2221::ChipSettings MCP2221::getChipSettings(int &errcnt, QString &errstr)
 }
 
 // Returns GP pin settings from the MCP2221 flash memory
-MCP2221::GPSettings getGPSettings(int &errcnt, QString &errstr)
+MCP2221::GPSettings MCP2221::getGPSettings(int &errcnt, QString &errstr)
 {
-    // TODO
+    QVector<quint8> command{
+        READ_FLASH_DATA, GP_SETTINGS  // Header
+    };
+    QVector<quint8> response = hidTransfer(command, errcnt, errstr);
+    GPSettings settings;
+    settings.gp0.func = static_cast<quint8>(0x07 & response.at(2));  // GP0 pin function corresponds to bits 2:0 of byte 2
+    settings.gp0.dir = (0x08 & response.at(2)) != 0x00;              // GP0 pin direction corresponds to bit 3 of byte 2
+    settings.gp0.out = (0x10 & response.at(2)) != 0x00;              // GP0 pin default output value corresponds to bit 4 of byte 2
+    settings.gp1.func = static_cast<quint8>(0x07 & response.at(3));  // GP1 pin function corresponds to bits 2:0 of byte 3
+    settings.gp1.dir = (0x08 & response.at(3)) != 0x00;              // GP1 pin direction corresponds to bit 3 of byte 3
+    settings.gp1.out = (0x10 & response.at(3)) != 0x00;              // GP1 pin default output value corresponds to bit 4 of byte 3
+    settings.gp2.func = static_cast<quint8>(0x07 & response.at(4));  // GP2 pin function corresponds to bits 2:0 of byte 4
+    settings.gp2.dir = (0x08 & response.at(4)) != 0x00;              // GP2 pin direction corresponds to bit 3 of byte 4
+    settings.gp2.out = (0x10 & response.at(4)) != 0x00;              // GP2 pin default output value corresponds to bit 4 of byte 4
+    settings.gp3.func = static_cast<quint8>(0x07 & response.at(5));  // GP3 pin function corresponds to bits 2:0 of byte 5
+    settings.gp3.dir = (0x08 & response.at(5)) != 0x00;              // GP3 pin direction corresponds to bit 3 of byte 5
+    settings.gp3.out = (0x10 & response.at(5)) != 0x00;              // GP3 pin default output value corresponds to bit 4 of byte 5
+    return settings;
 }
 
 // Retrieves the factory serial number from the MCP2221 flash memory
@@ -421,7 +438,7 @@ quint8 MCP2221::writeChipSettings(const ChipSettings &settings, SecurityOptions 
         command[1] = CHIP_SETTINGS;
         command[2] = static_cast<quint8>(settings.usb.serialen << 7 | options.lock << 1 | options.password);                                                   // Serial enable and security flags
         command[3] = static_cast<quint8>(0x1f & settings.clockdiv);                                                                                            // Clock output divider
-        command[4] = static_cast<quint8>((0x03 & settings.dac.vrm) << 6 | settings.dac.refopt << 4 | (0x1f & settings.dac.defval));                            // DAC parameters
+        command[4] = static_cast<quint8>((0x03 & settings.dac.vrm) << 6 | settings.dac.refopt << 5 | (0x1f & settings.dac.defval));                            // DAC parameters
         command[5] = static_cast<quint8>(settings.intr.detneg << 6 | settings.intr.detpos << 5 | (0x03 & settings.adc.vrm) << 3 |  settings.adc.refopt << 2);  // Interrupt and ADC parameters
         command[6] = static_cast<quint8>(settings.usb.vid);                                                                                                    // Vendor ID
         command[7] = static_cast<quint8>(settings.usb.vid >> 8);
@@ -449,9 +466,15 @@ quint8 MCP2221::writeChipSettings(const ChipSettings &settings, int &errcnt, QSt
 // Writes the given GP pin settings to the MCP2221 flash memory
 quint8 MCP2221::writeGPSettings(const GPSettings &settings, int &errcnt, QString &errstr)
 {
-    quint8 retval;
-    // TODO
-    return retval;
+    QVector<quint8> command{
+        WRITE_FLASH_DATA, GP_SETTINGS,                                                                     // Header
+        static_cast<quint8>(settings.gp0.out << 4 | settings.gp0.dir << 3 | (0x08 & settings.gp0.func)),   // GP0 pin parameters
+        static_cast<quint8>(settings.gp1.out << 4 | settings.gp1.dir << 3 | (0x08 & settings.gp1.func)),   // GP1 pin parameters
+        static_cast<quint8>(settings.gp2.out << 4 | settings.gp2.dir << 3 | (0x08 & settings.gp2.func)),   // GP2 pin parameters
+        static_cast<quint8>(settings.gp3.out << 4 | settings.gp3.dir << 3 | (0x08 & settings.gp3.func))    // GP3 pin parameters
+    };
+    QVector<quint8> response = hidTransfer(command, errcnt, errstr);
+    return response.at(1);
 }
 
 // Writes the manufacturer descriptor to the MCP2221 flash memory

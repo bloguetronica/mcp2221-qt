@@ -60,6 +60,7 @@ public:
 
     // Flash data sub-command IDs
     static const quint8 CHIP_SETTINGS = 0x00;      // Chip settings
+    static const quint8 GP_SETTINGS = 0x01;        // GP pin settings
     static const quint8 MANUFACTURER_DESC = 0x02;  // USB manufacturer descriptor
     static const quint8 PRODUCT_DESC = 0x03;       // USB product descriptor
     static const quint8 SERIAL_DESC = 0x04;        // USB serial descriptor
@@ -148,19 +149,19 @@ public:
 
     // Menber of GPSettings
     struct GPPinParameters {
-        quint8 func;
-        bool dir;
-        bool out;
+        quint8 func;  // Pin function
+        bool dir;     // Pin direction
+        bool out;     // Pin default output value
 
         bool operator ==(const GPPinParameters &other) const;
         bool operator !=(const GPPinParameters &other) const;
     };
 
     struct GPSettings {
-        GPPinParameters gp0;
-        GPPinParameters gp1;
-        GPPinParameters gp2;
-        GPPinParameters gp3;
+        GPPinParameters gp0;  // GP0 pin parameters
+        GPPinParameters gp1;  // GP1 pin parameters
+        GPPinParameters gp2;  // GP2 pin parameters
+        GPPinParameters gp3;  // GP3 pin parameters
 
         bool operator ==(const GPSettings &other) const;
         bool operator !=(const GPSettings &other) const;
