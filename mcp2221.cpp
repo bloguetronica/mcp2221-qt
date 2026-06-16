@@ -233,7 +233,7 @@ MCP2221::ChipSettings MCP2221::getChipSettings(int &errcnt, QString &errstr)
     settings.clockdiv = static_cast<quint8>(0x1f & response.at(5));                   // Clock divider corresponds to bits 4:0 of byte 5
     settings.intr.detpos = (0x20 & response.at(7)) != 0x00;                           // Interrupt detection on positive edge corresponds to bit 5 of byte 7
     settings.intr.detneg = (0x40 & response.at(7)) != 0x00;                           // Interrupt detection on negative edge corresponds to bit 6 of byte 7
-    settings.adc.vrm = static_cast<quint8>(0x03 & response.at(6) >> 3);               // ADC reference voltage (Vrm) corresponds to bits 4:3 of byte 7
+    settings.adc.vrm = static_cast<quint8>(0x03 & response.at(7) >> 3);               // ADC reference voltage (Vrm) corresponds to bits 4:3 of byte 7
     settings.adc.refopt = (0x04 & response.at(7)) != 0x00;                            // ADC reference option corresponds to bit 2 of byte 7
     settings.dac.vrm = static_cast<quint8>(0x03 & response.at(6) >> 6);               // DAC reference voltage (Vrm) corresponds to bits 7:6 of byte 6
     settings.dac.refopt = (0x20 & response.at(6)) != 0x00;                            // DAC reference option corresponds to bit 5 of byte 6
