@@ -76,11 +76,24 @@ public:
 
     // The following values are applicable to ChipSettings.ADCParameters/ChipSettings.DACParameters/getChipSettings()/writeChipSettings()
     static const quint8 VRMOFF = 0x00;    // Internal voltage reference (VRM) set to be off
-    static const quint8 VRM1V024 = 0x01;  // Value corresponding to a reference voltage (Vrm) of 1.024V
-    static const quint8 VRM2V048 = 0x02;  // Value corresponding to a reference voltage (Vrm) of 2.048V
-    static const quint8 VRM4V096 = 0x03;  // Value corresponding to a reference voltage (Vrm) of 4.096V
+    static const quint8 VRM1V024 = 0x01;  // Value corresponding to a reference voltage (Vrm) of 1.024 V
+    static const quint8 VRM2V048 = 0x02;  // Value corresponding to a reference voltage (Vrm) of 2.048 V
+    static const quint8 VRM4V096 = 0x03;  // Value corresponding to a reference voltage (Vrm) of 4.096 V
     static const bool REFOPTVDD = false;  // ADC or DAC reference set to Vdd
     static const bool REFOPTVRM = true;   // ADC or DAC reference set to Vrm
+
+    // The following values are applicable to ChipSettings.Clock/getChipSettings()/writeChipSettings()
+    static const quint8 CLKDIV24M = 0x01;   // Clock output set to 24 MHz
+    static const quint8 CLKDIV12M = 0x02;   // Clock output set to 12 MHz
+    static const quint8 CLKDIV6M = 0x03;    // Clock output set to 6 MHz
+    static const quint8 CLKDIV3M = 0x04;    // Clock output set to 3 MHz
+    static const quint8 CLKDIV1M5 = 0x05;   // Clock output set to 1.5 MHz
+    static const quint8 CLKDIV750K = 0x06;  // Clock output set to 750 KHz
+    static const quint8 CLKDIV375K = 0x07;  // Clock output set to 375 KHz
+    static const quint8 CLKDC0 = 0x00;      // Value corresponding to a duty cycle of 0%
+    static const quint8 CLKDC25 = 0x01;     // Value corresponding to a duty cycle of 25%
+    static const quint8 CLKDC50 = 0x02;     // Value corresponding to a duty cycle of 50%
+    static const quint8 CLKDC75 = 0x03;     // Value corresponding to a duty cycle of 75%
 
     // The following values are applicable to ChipSettings.USBParameters/getChipSettings()/writeChipSettings()
     static const bool PMBUS = false;  // Value corresponding to USB bus-powered mode
@@ -102,6 +115,15 @@ public:
 
         bool operator ==(const ADCParameters &other) const;
         bool operator !=(const ADCParameters &other) const;
+    };
+
+    // Member of ChipSettings
+    struct ClockParameters{
+        quint8 div;  // Clock output divider
+        quint8 dc;   // Clock output duty cycle
+
+        bool operator ==(const ClockParameters &other) const;
+        bool operator !=(const ClockParameters &other) const;
     };
 
     // Member of ChipSettings
@@ -137,7 +159,7 @@ public:
     };
 
     struct ChipSettings {
-        quint8 clockdiv;           // Clock output divider
+        ClockParameters clock;     // Clock output parameters
         InterruptParameters intr;  // Interrupt parameters
         ADCParameters adc;         // ADC parameters
         DACParameters dac;         // DAC parameters
