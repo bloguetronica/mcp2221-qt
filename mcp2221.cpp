@@ -268,18 +268,18 @@ MCP2221::GPSettings MCP2221::getGPSettings(int &errcnt, QString &errstr)
     };
     QVector<quint8> response = hidTransfer(command, errcnt, errstr);
     GPSettings settings;
-    settings.gp0.func = static_cast<quint8>(0x07 & response.at(2));  // GP0 pin function corresponds to bits 2:0 of byte 2
-    settings.gp0.dir = (0x08 & response.at(2)) != 0x00;              // GP0 pin direction corresponds to bit 3 of byte 2
-    settings.gp0.out = (0x10 & response.at(2)) != 0x00;              // GP0 pin default output value corresponds to bit 4 of byte 2
-    settings.gp1.func = static_cast<quint8>(0x07 & response.at(3));  // GP1 pin function corresponds to bits 2:0 of byte 3
-    settings.gp1.dir = (0x08 & response.at(3)) != 0x00;              // GP1 pin direction corresponds to bit 3 of byte 3
-    settings.gp1.out = (0x10 & response.at(3)) != 0x00;              // GP1 pin default output value corresponds to bit 4 of byte 3
-    settings.gp2.func = static_cast<quint8>(0x07 & response.at(4));  // GP2 pin function corresponds to bits 2:0 of byte 4
-    settings.gp2.dir = (0x08 & response.at(4)) != 0x00;              // GP2 pin direction corresponds to bit 3 of byte 4
-    settings.gp2.out = (0x10 & response.at(4)) != 0x00;              // GP2 pin default output value corresponds to bit 4 of byte 4
-    settings.gp3.func = static_cast<quint8>(0x07 & response.at(5));  // GP3 pin function corresponds to bits 2:0 of byte 5
-    settings.gp3.dir = (0x08 & response.at(5)) != 0x00;              // GP3 pin direction corresponds to bit 3 of byte 5
-    settings.gp3.out = (0x10 & response.at(5)) != 0x00;              // GP3 pin default output value corresponds to bit 4 of byte 5
+    settings.gp0.func = static_cast<quint8>(0x07 & response.at(4));  // GP0 pin function corresponds to bits 2:0 of byte 4
+    settings.gp0.dir = (0x08 & response.at(4)) != 0x00;              // GP0 pin direction corresponds to bit 3 of byte 4
+    settings.gp0.out = (0x10 & response.at(4)) != 0x00;              // GP0 pin default output value corresponds to bit 4 of byte 4
+    settings.gp1.func = static_cast<quint8>(0x07 & response.at(5));  // GP1 pin function corresponds to bits 2:0 of byte 5
+    settings.gp1.dir = (0x08 & response.at(5)) != 0x00;              // GP1 pin direction corresponds to bit 3 of byte 5
+    settings.gp1.out = (0x10 & response.at(5)) != 0x00;              // GP1 pin default output value corresponds to bit 4 of byte 5
+    settings.gp2.func = static_cast<quint8>(0x07 & response.at(6));  // GP2 pin function corresponds to bits 2:0 of byte 6
+    settings.gp2.dir = (0x08 & response.at(6)) != 0x00;              // GP2 pin direction corresponds to bit 3 of byte 6
+    settings.gp2.out = (0x10 & response.at(6)) != 0x00;              // GP2 pin default output value corresponds to bit 4 of byte 6
+    settings.gp3.func = static_cast<quint8>(0x07 & response.at(7));  // GP3 pin function corresponds to bits 2:0 of byte 7
+    settings.gp3.dir = (0x08 & response.at(7)) != 0x00;              // GP3 pin direction corresponds to bit 3 of byte 7
+    settings.gp3.out = (0x10 & response.at(7)) != 0x00;              // GP3 pin default output value corresponds to bit 4 of byte 7
     return settings;
 }
 
@@ -481,10 +481,10 @@ quint8 MCP2221::writeGPSettings(const GPSettings &settings, int &errcnt, QString
 {
     QVector<quint8> command{
         WRITE_FLASH_DATA, GP_SETTINGS,                                                                     // Header
-        static_cast<quint8>(settings.gp0.out << 4 | settings.gp0.dir << 3 | (0x08 & settings.gp0.func)),   // GP0 pin parameters
-        static_cast<quint8>(settings.gp1.out << 4 | settings.gp1.dir << 3 | (0x08 & settings.gp1.func)),   // GP1 pin parameters
-        static_cast<quint8>(settings.gp2.out << 4 | settings.gp2.dir << 3 | (0x08 & settings.gp2.func)),   // GP2 pin parameters
-        static_cast<quint8>(settings.gp3.out << 4 | settings.gp3.dir << 3 | (0x08 & settings.gp3.func))    // GP3 pin parameters
+        static_cast<quint8>(settings.gp0.out << 4 | settings.gp0.dir << 3 | (0x07 & settings.gp0.func)),   // GP0 pin parameters
+        static_cast<quint8>(settings.gp1.out << 4 | settings.gp1.dir << 3 | (0x07 & settings.gp1.func)),   // GP1 pin parameters
+        static_cast<quint8>(settings.gp2.out << 4 | settings.gp2.dir << 3 | (0x07 & settings.gp2.func)),   // GP2 pin parameters
+        static_cast<quint8>(settings.gp3.out << 4 | settings.gp3.dir << 3 | (0x07 & settings.gp3.func))    // GP3 pin parameters
     };
     QVector<quint8> response = hidTransfer(command, errcnt, errstr);
     return response.at(1);
