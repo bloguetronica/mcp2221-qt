@@ -403,6 +403,16 @@ int MCP2221::open(quint16 vid, quint16 pid, const QString &serial)
     return retval;
 }
 
+// Issues a reset to the MCP2221
+void MCP2221::reset(int &errcnt, QString &errstr)
+{
+    QVector<quint8> command{
+        RESET_DEVICE,     // Header
+        0xab, 0xcd, 0xef  // Reset key
+    };
+    hidTransfer(command, errcnt, errstr);
+}
+
 // Sends password over to the MCP2221
 // This function should be called before modifying a setting in the flash memory, if a password is set
 quint8 MCP2221::usePassword(const QString &password, int &errcnt, QString &errstr)

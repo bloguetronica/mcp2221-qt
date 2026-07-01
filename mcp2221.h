@@ -55,6 +55,7 @@ public:
 
     // HID command IDs
     static const quint8 READ_FLASH_DATA = 0xb0;   // Read flash memory data
+    static const quint8 RESET_DEVICE = 0x70;      // Reset_Device
     static const quint8 WRITE_FLASH_DATA = 0xb1;  // Write flash memory data
     static const quint8 SEND_PASSWORD = 0xb2;     // Send password
 
@@ -213,6 +214,7 @@ public:
     QString getSerialDesc(int &errcnt, QString &errstr);
     QVector<quint8> hidTransfer(const QVector<quint8> &data, int &errcnt, QString &errstr);
     int open(quint16 vid, quint16 pid, const QString &serial = QString());
+    void reset(int &errcnt, QString &errstr);
     quint8 usePassword(const QString &password, int &errcnt, QString &errstr);
     quint8 writeChipSettings(const ChipSettings &settings, SecurityOptions &options, const QString &password, int &errcnt, QString &errstr);
     quint8 writeChipSettings(const ChipSettings &settings, int &errcnt, QString &errstr);
